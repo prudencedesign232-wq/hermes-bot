@@ -34,12 +34,15 @@ client.once('ready', () => {
 // Fonction pour appeler l'API OpenRouter
 async function askAI(prompt) {
     try {
+        console.log(`🤔 Appel API pour: ${prompt.substring(0, 50)}...`);
+        console.log(`🔑 Clé API présente: ${OPENROUTER_API_KEY ? 'OUI' : 'NON!'}`);
+        
         const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
                 'Content-Type': 'application/json',
-                'HTTP-Referer': 'https://github.com/ton-username/hermes-bot',
+                'HTTP-Referer': 'https://github.com/prudencedesign232-wq/hermes-bot',
                 'X-Title': 'Hermes Discord Bot'
             },
             body: JSON.stringify({
@@ -47,7 +50,7 @@ async function askAI(prompt) {
                 messages: [
                     {
                         role: "system",
-                        content: "Tu es Hermes, un assistant IA intelligent et utile. Tu réponds de manière claire et concise en français."
+                        content: "Tu es Hermes, un assistant IA intelligent et utile."
                     },
                     {
                         role: "user",
@@ -57,11 +60,20 @@ async function askAI(prompt) {
             })
         });
 
+        console.log(`📊 Status HTTP: ${response.status}`);
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error(`❌ Erreur API:`, errorText);
+            return `Erreur API (${response.status}): ${errorText}`;
+        }
+
         const data = await response.json();
+        console.log(`✅ Réponse API reçue!`);
         return data.choices[0].message.content;
     } catch (error) {
-        console.error("Erreur API OpenRouter:", error);
-        return "Désolé, j'ai rencontré une erreur technique. Réessaie plus tard.";
+        console.error("❌ Erreur complète:", error.message);
+        return `Erreur: ${error.message}`;
     }
 }
 
