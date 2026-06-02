@@ -161,7 +161,14 @@ client.on('messageCreate', async (message) => {
             // Envoyer directement à l'IA
             const typingIndicator = await message.reply("🤔 Je réfléchis...");
             const response = await askAI(command);
-            await typingIndicator.edit(`💬 **Réponse:**\n${response}`);
+            // Limiter la réponse à 1900 caractères (Discord limite à 2000)
+let limitedResponse = response;
+if (response.length > 1900) {
+    limitedResponse = response.substring(0, 1897) + '...';
+    console.log(`⚠️ Réponse tronquée (${response.length} -> 1900 caractères)`);
+}
+
+await typingIndicator.edit(`💬 **Réponse:**\n${limitedResponse}`);
         }
         // Juste une mention sans commande
         else {
